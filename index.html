@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BALAPAN KATA: PETUALANGAN MENCARI MAKNA</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Fredoka & Comic Neue for friendly child-oriented typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        skyBlue: '#38bdf8',
+                        sunYellow: '#facc15',
+                        trackOrange: '#fb923c',
+                        grassGreen: '#4ade80',
+                        finishRed: '#ef4444'
+                    },
+                    fontFamily: {
+                        sans: ['Fredoka', 'sans-serif'],
+                        comic: ['Comic Neue', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', cursive, sans-serif;
+            background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 100%);
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        /* Scenery Animations */
+        @keyframes floatSun {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+        .animate-sun {
+            animation: floatSun 6s ease-in-out infinite;
+        }
+
+        @keyframes moveCloud {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100vw); }
+        }
+        .cloud-1 { animation: moveCloud 35s linear infinite; }
+        .cloud-2 { animation: moveCloud 50s linear infinite 10s; }
+
+        /* Track and Car styling */
+        .race-track {
+            background: linear-gradient(90deg, #334155 0%, #475569 100%);
+            border-top: 6px solid #f59e0b;
+            border-bottom: 6px solid #f59e0b;
+            position: relative;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .road-line {
+            background-image: linear-gradient(to right, #ffffff 50%, rgba(255,255,255,0) 0%);
+            background-position: bottom;
+            background-size: 40px 6px;
+            background-repeat: repeat-x;
+        }
+
+        .finish-flag-pattern {
+            background-color: #ffffff;
+            background-image: radial-gradient(#000000 36%, transparent 36%), radial-gradient(#000000 36%, transparent 36%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        /* Bounce button effect */
+        .btn-bounce {
+            transition: all 0.2s ease;
+        }
+        .btn-bounce:hover {
+            transform: scale(1.05);
+        }
+        .btn-bounce:active {
+            transform: scale(0.95);
+        }
+
+        /* Card Glow */
+        .glow-card {
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.3), 0 8px 10px -6px rgba(14, 165, 233, 0.2);
+        }
+
+        /* Smooth Car Movement */
+        #playerCar {
+            transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden text-slate-800">
+
+    <!-- Morning Sky Background & Scenery -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <!-- Sun -->
+        <div class="absolute top-4 left-6 sm:left-12 text-amber-400 text-6xl sm:text-8xl animate-sun opacity-90 drop-shadow-lg">
+            <i class="fa-solid fa-sun"></i>
+        </div>
+        <!-- Sunrise Glow -->
+        <div class="absolute -top-24 -left-24 w-96 h-96 bg-amber-200 rounded-full blur-3xl opacity-50"></div>
+        
+        <!-- Moving Clouds -->
+        <div class="cloud-1 absolute top-12 text-white text-5xl sm:text-7xl opacity-80">
+            <i class="fa-solid fa-cloud"></i>
+        </div>
+        <div class="cloud-2 absolute top-24 text-white text-4xl sm:text-6xl opacity-70">
+            <i class="fa-solid fa-cloud"></i>
+        </div>
+
+        <!-- Mountains in Background -->
+        <div class="absolute bottom-32 inset-x-0 flex justify-between items-end opacity-40">
+            <div class="w-1/3 h-48 bg-emerald-700 rounded-t-full transform -translate-x-12"></div>
+            <div class="w-1/2 h-64 bg-teal-800 rounded-t-full"></div>
+            <div class="w-1/3 h-40 bg-emerald-600 rounded-t-full transform translate-x-12"></div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="relative z-10 max-w-4xl w-full mx-auto p-4 flex-grow flex flex-col justify-center">
+
+        <!-- ================= PAGE 1: WELCOME SCREEN ================= -->
+        <div id="welcomeScreen" class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 border-4 border-sky-300 shadow-2xl my-auto">
+            <div class="text-center mb-6">
+                <span class="inline-block bg-amber-100 text-amber-800 text-sm sm:text-base px-4 py-1.5 rounded-full font-bold mb-2 shadow-sm border border-amber-300">
+                    <i class="fa-solid fa-gamepad mr-2 text-amber-600"></i>Game Edukasi Bahasa Indonesia SD Kelas 3
+                </span>
+                <h1 class="text-3xl sm:text-5xl font-extrabold text-sky-600 tracking-wide drop-shadow-sm leading-tight mt-1">
+                    BALAPAN KATA
+                </h1>
+                <h2 class="text-xl sm:text-2xl font-bold text-amber-500 mt-1">
+                    Petualangan Mencari Makna <i class="fa-solid fa-flag-checkered ml-1"></i>
+                </h2>
+            </div>
+
+            <!-- Material Brief Box -->
+            <div class="bg-sky-50 rounded-2xl p-4 sm:p-5 border-2 border-sky-200 mb-6">
+                <h3 class="font-bold text-sky-800 text-lg mb-2 flex items-center">
+                    <i class="fa-solid fa-book-open text-sky-500 mr-2"></i> Materi Kata Hari Ini:
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs sm:text-sm font-semibold text-sky-900">
+                    <div class="bg-white p-2 rounded-lg border border-sky-100 shadow-sm text-center">1. Fajar</div>
+                    <div class="bg-white p-2 rounded-lg border border-sky-100 shadow-sm text-center">2. Menyingsing</div>
+                    <div class="bg-white p-2 rounded-lg border border-sky-100 shadow-sm text-center">3. Ufuk</div>
+                    <div class="bg-white p-2 rounded-lg border border-sky-100 shadow-sm text-center">4. Mentari</div>
+                    <div class="bg-white p-2 rounded-lg border border-sky-100 shadow-sm text-center">5. Beranjak</div>
+                    <div class="bg-white p-2 rounded-lg border border-sky-100 shadow-sm text-center">6. Karunia</div>
+                </div>
+            </div>
+
+            <!-- Form Inputs -->
+            <form id="startForm" onsubmit="startGame(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="sm:col-span-2">
+                        <label for="studentName" class="block text-sm font-bold text-slate-700 mb-1">
+                            <i class="fa-solid fa-user text-sky-500 mr-1"></i> Nama Lengkap Siswa:
+                        </label>
+                        <input type="text" id="studentName" required placeholder="Ketik namamu di sini..." 
+                            class="w-full px-4 py-3 rounded-xl border-2 border-sky-300 focus:border-sky-500 focus:outline-none text-base font-semibold shadow-inner transition">
+                    </div>
+                    <div>
+                        <label for="studentClass" class="block text-sm font-bold text-slate-700 mb-1">
+                            <i class="fa-solid fa-school text-sky-500 mr-1"></i> Kelas:
+                        </label>
+                        <select id="studentClass" required class="w-full px-4 py-3 rounded-xl border-2 border-sky-300 focus:border-sky-500 focus:outline-none text-base font-semibold bg-white shadow-inner transition">
+                            <option value="3A">Kelas 3A</option>
+                            <option value="3B">Kelas 3B</option>
+                            <option value="3C">Kelas 3C</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Game Instructions -->
+                <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200 text-slate-700 text-xs sm:text-sm">
+                    <p class="font-bold text-amber-800 mb-1"><i class="fa-solid fa-lightbulb mr-1 text-amber-500"></i> Cara Bermain:</p>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li>Jawab 10 pertanyaan tentang makna kata dengan benar.</li>
+                        <li>Setiap jawaban benar bernilai <strong>10 Poin</strong> dan mobilmu akan melaju makin dekat ke garis finis!</li>
+                        <li>Selesaikan balapan dengan skor tertinggi dan kirim hasilnya ke WhatsApp Gurumu!</li>
+                    </ul>
+                </div>
+
+                <!-- Sound FX Toggle -->
+                <div class="flex items-center justify-between px-2 pt-1">
+                    <span class="text-xs sm:text-sm font-bold text-slate-600">
+                        <i class="fa-solid fa-volume-high text-sky-500 mr-1"></i> Efek Suara Game
+                    </span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="soundToggle" checked class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full btn-bounce bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-extrabold text-xl sm:text-2xl py-4 rounded-2xl shadow-lg border-b-4 border-green-800 flex items-center justify-center space-x-3 cursor-pointer">
+                    <i class="fa-solid fa-flag-checkered text-amber-300"></i>
+                    <span>MULAI BALAPAN!</span>
+                    <i class="fa-solid fa-car-side text-amber-300"></i>
+                </button>
+            </form>
+        </div>
+
+
+        <!-- ================= PAGE 2: GAMEPLAY SCREEN ================= -->
+        <div id="gameScreen" class="hidden flex-col space-y-4 my-auto">
+            
+            <!-- Top Dashboard -->
+            <div class="bg-white/95 backdrop-blur-md rounded-2xl p-4 border-2 border-sky-300 shadow-lg flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-sky-100 p-2.5 rounded-xl border border-sky-200">
+                        <i class="fa-solid fa-user-graduate text-sky-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p id="hudStudentName" class="font-bold text-slate-800 text-sm sm:text-base leading-tight">Nama Siswa</p>
+                        <span id="hudStudentClass" class="text-xs bg-sky-200 text-sky-800 px-2 py-0.5 rounded-full font-bold">Kelas 3A</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- Question Counter Badge -->
+                    <div class="bg-amber-100 border border-amber-300 px-3 py-1.5 rounded-xl text-center">
+                        <p class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">Pertanyaan</p>
+                        <p id="questionCounter" class="font-extrabold text-amber-800 text-base sm:text-lg">Soal 1 dari 10</p>
+                    </div>
+                    <!-- Current Score Badge -->
+                    <div class="bg-emerald-100 border border-emerald-300 px-3 py-1.5 rounded-xl text-center">
+                        <p class="text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Skor Balap</p>
+                        <p id="scoreDisplay" class="font-extrabold text-emerald-800 text-base sm:text-lg">0 Poin</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Race Track Visualizer -->
+            <div class="bg-white/90 backdrop-blur-sm p-3 rounded-2xl border-2 border-amber-300 shadow-md">
+                <div class="flex justify-between items-center text-xs font-bold text-slate-600 mb-1 px-1">
+                    <span><i class="fa-solid fa-play text-emerald-500 mr-1"></i> GARIS START</span>
+                    <span class="text-amber-600"><i class="fa-solid fa-trophy mr-1"></i> GARIS FINIS</span>
+                </div>
+                
+                <div class="race-track h-20 rounded-xl flex items-center overflow-hidden px-4">
+                    <!-- Road Dash Lines -->
+                    <div class="absolute inset-0 road-line my-auto h-1 opacity-60"></div>
+
+                    <!-- Finish Line Banner -->
+                    <div class="absolute right-0 top-0 bottom-0 w-8 finish-flag-pattern border-l-2 border-slate-900 flex items-center justify-center">
+                        <span class="bg-red-600 text-white text-[10px] font-black px-1 py-3 rounded transform rotate-90 shadow">FINISH</span>
+                    </div>
+
+                    <!-- Player's Cute Race Car -->
+                    <div id="playerCar" class="absolute left-[3%] z-10 flex flex-col items-center transform -translate-x-1/2">
+                        <span class="bg-amber-400 text-slate-900 font-bold text-[10px] px-2 py-0.5 rounded-full shadow-md mb-1 animate-pulse border border-amber-500">
+                            Kamu!
+                        </span>
+                        <!-- Cute Red Sports Car SVG -->
+                        <div class="w-14 sm:w-16 h-8 text-red-500 drop-shadow-md">
+                            <svg viewBox="0 0 100 50" fill="currentColor" class="w-full h-full">
+                                <!-- Car Body -->
+                                <path d="M 10 30 Q 15 15 35 15 L 65 15 Q 80 15 90 30 L 95 32 Q 98 35 95 38 L 5 38 Q 2 35 5 32 Z" fill="#ef4444" />
+                                <!-- Roof/Cabin -->
+                                <path d="M 30 17 L 42 5 L 68 5 L 75 17 Z" fill="#38bdf8" stroke="#0284c7" stroke-width="2" />
+                                <!-- Headlight -->
+                                <circle cx="92" cy="30" r="3" fill="#fef08a" />
+                                <!-- Spoiler -->
+                                <path d="M 5 20 L 15 20 L 12 28 L 8 28 Z" fill="#b91c1c" />
+                                <!-- Wheels -->
+                                <circle cx="25" cy="38" r="9" fill="#1e293b" />
+                                <circle cx="25" cy="38" r="4" fill="#94a3b8" />
+                                <circle cx="75" cy="38" r="9" fill="#1e293b" />
+                                <circle cx="75" cy="38" r="4" fill="#94a3b8" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Card -->
+            <div class="bg-white rounded-3xl p-5 sm:p-7 border-4 border-sky-300 shadow-xl space-y-5">
+                <!-- Question Text -->
+                <div class="bg-sky-50 p-4 sm:p-5 rounded-2xl border-2 border-sky-200">
+                    <span class="text-xs font-bold text-sky-600 uppercase tracking-wide block mb-1">
+                        <i class="fa-solid fa-circle-question mr-1"></i> Soal Makna Kata:
+                    </span>
+                    <h3 id="questionText" class="text-lg sm:text-xl font-bold text-slate-800 leading-snug">
+                        Memuat pertanyaan...
+                    </h3>
+                </div>
+
+                <!-- Answer Choices Options -->
+                <div id="optionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Options injected via JavaScript -->
+                </div>
+
+                <!-- Feedback Banner -->
+                <div id="feedbackBox" class="hidden p-4 rounded-2xl border-2 text-center text-sm sm:text-base font-bold transition-all duration-300">
+                    <p id="feedbackText"></p>
+                    <button id="nextBtn" onclick="nextQuestion()" class="mt-3 btn-bounce bg-sky-500 hover:bg-sky-600 text-white font-bold px-6 py-2 rounded-xl text-sm shadow-md inline-flex items-center space-x-2 cursor-pointer">
+                        <span>Lanjut ke Soal Berikutnya</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ================= PAGE 3: RESULT SCREEN ================= -->
+        <div id="resultScreen" class="hidden bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 border-4 border-amber-300 shadow-2xl my-auto">
+            <div class="text-center mb-6">
+                <div id="resultBadge" class="inline-block p-4 rounded-full bg-amber-100 text-amber-500 text-4xl mb-2 animate-bounce">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-slate-800">
+                    BALAPAN SELESAI!
+                </h2>
+                <p class="text-slate-600 font-medium text-sm sm:text-base">
+                    Kamu telah berhasil mencapai Garis Finis!
+                </p>
+            </div>
+
+            <!-- Score Summary Card -->
+            <div class="bg-gradient-to-br from-sky-50 to-amber-50 rounded-2xl p-5 border-2 border-sky-200 mb-6 space-y-4">
+                <div class="text-center border-b pb-4 border-sky-200">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">NILAI AKHIR KAMU</p>
+                    <p id="finalScore" class="text-5xl sm:text-6xl font-black text-emerald-600 my-1">100</p>
+                    <p id="motivationText" class="text-sm sm:text-base font-bold text-sky-700">
+                        Luar Biasa! Kamu Sangat Hebat!
+                    </p>
+                </div>
+
+                <!-- Detail Grid -->
+                <div class="grid grid-cols-2 gap-3 text-xs sm:text-sm">
+                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                        <span class="text-slate-500 block text-[11px]">Nama Siswa:</span>
+                        <span id="resName" class="font-bold text-slate-800">-</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                        <span class="text-slate-500 block text-[11px]">Kelas:</span>
+                        <span id="resClass" class="font-bold text-slate-800">-</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                        <span class="text-slate-500 block text-[11px]">Mata Pelajaran:</span>
+                        <span class="font-bold text-slate-800">Bahasa Indonesia</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200">
+                        <span class="text-slate-500 block text-[11px]">Materi:</span>
+                        <span class="font-bold text-slate-800">Makna Kata</span>
+                    </div>
+                    <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                        <span class="text-emerald-600 block text-[11px]">Jawaban Benar:</span>
+                        <span id="resCorrect" class="font-bold text-emerald-700 text-base">0 Soal</span>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-xl border border-red-200">
+                        <span class="text-red-600 block text-[11px]">Jawaban Salah:</span>
+                        <span id="resWrong" class="font-bold text-red-700 text-base">0 Soal</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3 rounded-xl border border-slate-200 text-center text-xs font-bold text-slate-600">
+                    <i class="fa-regular fa-clock text-sky-500 mr-1"></i> Waktu Pengerjaan: <span id="resTime">0 detik</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+                <!-- WhatsApp Teacher Send Button -->
+                <button onclick="sendToWhatsApp()" class="w-full btn-bounce bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold py-4 px-4 rounded-2xl shadow-lg border-b-4 border-emerald-700 flex items-center justify-center space-x-2 text-base sm:text-lg cursor-pointer">
+                    <i class="fa-brands fa-whatsapp text-2xl"></i>
+                    <span>KIRIM HASIL NILAI KE WHATSAPP GURU</span>
+                </button>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="restartGame()" class="btn-bounce bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-3 rounded-xl shadow border-b-4 border-sky-700 flex items-center justify-center space-x-2 text-sm cursor-pointer">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>ULANGI PERMAINAN</span>
+                    </button>
+                    <button onclick="returnToMenu()" class="btn-bounce bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-3 rounded-xl shadow border-b-4 border-slate-800 flex items-center justify-center space-x-2 text-sm cursor-pointer">
+                        <i class="fa-solid fa-house"></i>
+                        <span>MENU UTAMA</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer Credit -->
+    <div class="relative z-10 text-center py-3 text-xs font-bold text-slate-600">
+        BALAPAN KATA &copy; Game Edukasi Kelas 3 SD - Pembelajaran Makna Kata
+    </div>
+
+    <script>
+        /* ================= GAME QUESTIONS DATA ================= */
+        // 10 Question items covering: Fajar, Menyingsing, Ufuk, Mentari, Beranjak, Karunia
+        const questionsData = [
+            {
+                question: "Fajar adalah waktu ketika ....",
+                options: [
+                    "Langit mulai terang sebelum matahari terbit",
+                    "Matahari berada tepat di atas kepala",
+                    "Langit menjadi gelap pada malam hari",
+                    "Hujan turun dengan deras"
+                ],
+                correct: 0
+            },
+            {
+                question: "Kata 'mentari' memiliki makna ....",
+                options: [
+                    "Bulan di malam hari",
+                    "Bintang di langit",
+                    "Matahari",
+                    "Awan putih"
+                ],
+                correct: 2
+            },
+            {
+                question: "Kata 'menyingsing' biasanya digunakan untuk matahari yang mulai ....",
+                options: [
+                    "Tenggelam di malam hari",
+                    "Muncul atau terbit",
+                    "Tertutup oleh awan tebal",
+                    "Sangat panas di siang hari"
+                ],
+                correct: 1
+            },
+            {
+                question: "Garis batas yang tampak antara langit dan bumi atau laut disebut ....",
+                options: [
+                    "Ufuk",
+                    "Pelangi",
+                    "Ombak",
+                    "Fajar"
+                ],
+                correct: 0
+            },
+            {
+                question: "Kata 'beranjak' dalam kalimat 'Ayah beranjak dari kursi' memiliki arti ....",
+                options: [
+                    "Mulai tidur pulas",
+                    "Mulai bergerak atau berpindah",
+                    "Duduk kembali dengan tenang",
+                    "Berhenti berbicara"
+                ],
+                correct: 1
+            },
+            {
+                question: "Segala nikmat dan kesehatan dari Tuhan adalah contoh 'karunia'. Arti kata 'karunia' adalah ....",
+                options: [
+                    "Pinjaman sementara",
+                    "Pemberian atau anugerah",
+                    "Hasil perbuatan jahat",
+                    "Barang yang dibeli di toko"
+                ],
+                correct: 1
+            },
+            {
+                question: "Bacalah kalimat berikut: 'Ibu bangun di waktu fajar untuk memasak.' Makna kata 'fajar' pada kalimat tersebut adalah ....",
+                options: [
+                    "Siang hari yang terik",
+                    "Pagi-pagi benar sebelum matahari terbit",
+                    "Sore hari saat matahari tenggelam",
+                    "Tengah malam yang sunyi"
+                ],
+                correct: 1
+            },
+            {
+                question: "Lengkapilah kalimat berikut: 'Saat pagi tiba, matahari mulai ... di sebelah timur.' Kata yang paling tepat adalah ....",
+                options: [
+                    "beranjak",
+                    "terbenam",
+                    "menyingsing",
+                    "karunia"
+                ],
+                correct: 2
+            },
+            {
+                question: "Lengkapilah kalimat berikut: 'Awan merah tampak indah di ... sebelah timur.' Kata yang cocok untuk mengisi titik-titik adalah ....",
+                options: [
+                    "ufuk",
+                    "karunia",
+                    "mentari",
+                    "fajar"
+                ],
+                correct: 0
+            },
+            {
+                question: "Manakah penggunaan kata 'mentari' dan 'karunia' yang tepat di bawah ini?",
+                options: [
+                    "Sinar mentari pagi adalah karunia Tuhan yang harus disyukuri.",
+                    "Karunia pagi bersinar terang menggantikan mentari.",
+                    "Ayah membaca mentari di ruang tamu.",
+                    "Mentari adalah waktu sebelum matahari terbit."
+                ],
+                correct: 0
+            }
+        ];
+
+        /* ================= GAME STATE VARIABLES ================= */
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctAnswersCount = 0;
+        let wrongAnswersCount = 0;
+        let studentName = "";
+        let studentClass = "3A";
+        let startTime = 0;
+        let endTime = 0;
+        let isAnswered = false;
+
+        const TEACHER_PHONE = "6285947564712";
+
+        /* ================= AUDIO SYNTHESIZER (Web Audio API) ================= */
+        // Synthesize simple sounds without relying on external audio files
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            const soundEnabled = document.getElementById('soundToggle').checked;
+            if (!soundEnabled) return;
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                // Happy Arpeggio Sound
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'wrong') {
+                // Low Error Buzzer
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.setValueAtTime(130, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'finish') {
+                // Fanfare
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.15); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.3); // G5
+                osc.frequency.setValueAtTime(1046.50, now + 0.45); // C6
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                osc.start(now);
+                osc.stop(now + 0.8);
+            }
+        }
+
+        /* ================= GAME FLOW CONTROLLERS ================= */
+
+        function startGame(event) {
+            event.preventDefault();
+
+            studentName = document.getElementById('studentName').value.trim();
+            studentClass = document.getElementById('studentClass').value;
+
+            if (!studentName) {
+                alert("Silakan masukkan nama lengkapmu terlebih dahulu!");
+                return;
+            }
+
+            // Reset Game Variables
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswersCount = 0;
+            wrongAnswersCount = 0;
+            startTime = new Date();
+
+            // Update HUD UI
+            document.getElementById('hudStudentName').innerText = studentName;
+            document.getElementById('hudStudentClass').innerText = "Kelas " + studentClass;
+            updateScoreHUD();
+
+            // Switch Screens
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+
+            // Move car to start position
+            updateCarPosition(0);
+
+            // Load first question
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isAnswered = false;
+            const q = questionsData[currentQuestionIndex];
+
+            // Update UI Counters
+            document.getElementById('questionCounter').innerText = `Soal ${currentQuestionIndex + 1} dari ${questionsData.length}`;
+            document.getElementById('questionText').innerText = q.question;
+
+            // Hide Feedback
+            const feedbackBox = document.getElementById('feedbackBox');
+            feedbackBox.classList.add('hidden');
+            feedbackBox.className = "hidden p-4 rounded-2xl border-2 text-center text-sm sm:text-base font-bold transition-all duration-300";
+
+            // Render Options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            const optionLabels = ['A', 'B', 'C', 'D'];
+
+            q.options.forEach((optionText, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `btn-bounce w-full p-4 rounded-2xl border-2 border-slate-200 bg-white hover:bg-sky-50 hover:border-sky-300 text-left flex items-center space-x-3 transition cursor-pointer shadow-sm`;
+                btn.onclick = () => selectAnswer(idx);
+
+                btn.innerHTML = `
+                    <span class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 font-extrabold flex items-center justify-center text-sm flex-shrink-0">
+                        ${optionLabels[idx]}
+                    </span>
+                    <span class="text-slate-700 font-semibold text-sm sm:text-base">${optionText}</span>
+                `;
+
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(selectedIndex) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const q = questionsData[currentQuestionIndex];
+            const isCorrect = (selectedIndex === q.correct);
+            const optionsBtns = document.getElementById('optionsContainer').children;
+            const feedbackBox = document.getElementById('feedbackBox');
+            const feedbackText = document.getElementById('feedbackText');
+
+            // Disable all option buttons
+            for (let i = 0; i < optionsBtns.length; i++) {
+                optionsBtns[i].disabled = true;
+                optionsBtns[i].classList.remove('hover:bg-sky-50', 'hover:border-sky-300', 'btn-bounce');
+            }
+
+            if (isCorrect) {
+                // Correct Answer Logic
+                score += 10;
+                correctAnswersCount++;
+                playSound('correct');
+
+                // Highlight Selected Button as Correct
+                optionsBtns[selectedIndex].classList.remove('bg-white', 'border-slate-200');
+                optionsBtns[selectedIndex].classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-800');
+
+                // Feedback UI
+                feedbackBox.classList.remove('hidden');
+                feedbackBox.classList.add('bg-emerald-50', 'border-emerald-300', 'text-emerald-800');
+                feedbackText.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500 text-xl mr-1"></i> Hebat! Kamu memahami makna kata dengan benar. Mobilmu melaju!`;
+
+                // Advance Car
+                updateCarPosition(correctAnswersCount);
+
+            } else {
+                // Wrong Answer Logic
+                wrongAnswersCount++;
+                playSound('wrong');
+
+                // Highlight Selected Button as Wrong
+                optionsBtns[selectedIndex].classList.remove('bg-white', 'border-slate-200');
+                optionsBtns[selectedIndex].classList.add('bg-red-100', 'border-red-400', 'text-red-800');
+
+                // Show Correct Answer
+                optionsBtns[q.correct].classList.remove('bg-white', 'border-slate-200');
+                optionsBtns[q.correct].classList.add('bg-emerald-50', 'border-emerald-400', 'text-emerald-800');
+
+                // Feedback UI
+                feedbackBox.classList.remove('hidden');
+                feedbackBox.classList.add('bg-amber-50', 'border-amber-300', 'text-amber-800');
+                feedbackText.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl mr-1"></i> Belum tepat. Yuk, baca soal berikutnya dengan teliti!`;
+            }
+
+            updateScoreHUD();
+        }
+
+        function updateScoreHUD() {
+            document.getElementById('scoreDisplay').innerText = score + " Poin";
+        }
+
+        function updateCarPosition(correctCount) {
+            // Track spans from 3% to 85% width
+            const startPercent = 3;
+            const endPercent = 85;
+            const totalQuestions = questionsData.length;
+            
+            const newPercent = startPercent + ((endPercent - startPercent) * (correctCount / totalQuestions));
+            document.getElementById('playerCar').style.left = newPercent + "%";
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questionsData.length) {
+                loadQuestion();
+            } else {
+                finishGame();
+            }
+        }
+
+        function finishGame() {
+            endTime = new Date();
+            playSound('finish');
+
+            // Calculate duration
+            const durationSeconds = Math.round((endTime - startTime) / 1000);
+
+            // Populate Results
+            document.getElementById('resName').innerText = studentName;
+            document.getElementById('resClass').innerText = "Kelas " + studentClass;
+            document.getElementById('resCorrect').innerText = correctAnswersCount + " Soal";
+            document.getElementById('resWrong').innerText = wrongAnswersCount + " Soal";
+            document.getElementById('finalScore').innerText = score;
+            document.getElementById('resTime').innerText = durationSeconds + " Detik";
+
+            // Motivation Message
+            const motivationText = document.getElementById('motivationText');
+            const resultBadge = document.getElementById('resultBadge');
+
+            if (score === 100) {
+                motivationText.innerText = "Luar Biasa! Nilai Sempurna! Kamu Sangat Hebat!";
+                resultBadge.innerHTML = `<i class="fa-solid fa-crown text-amber-500"></i>`;
+            } else if (score >= 70) {
+                motivationText.innerText = "Bagus Sekali! Kamu Sudah Memahami Makna Kata!";
+                resultBadge.innerHTML = `<i class="fa-solid fa-trophy text-amber-500"></i>`;
+            } else {
+                motivationText.innerText = "Tetap Semangat! Ayo Belajar Lagi dan Coba Ulangi!";
+                resultBadge.innerHTML = `<i class="fa-solid fa-star text-amber-500"></i>`;
+            }
+
+            // Switch Screen
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+        }
+
+        function sendToWhatsApp() {
+            const timeTaken = document.getElementById('resTime').innerText;
+
+            // Construct formatted message
+            const message = 
+`*HASIL GAME BALAPAN KATA*
+---------------------------------------
+*Nama siswa:* ${studentName}
+*Kelas:* Kelas ${studentClass}
+*Mata pelajaran:* Bahasa Indonesia
+*Materi:* Makna Kata
+---------------------------------------
+*Jumlah soal:* 10
+*Jawaban benar:* ${correctAnswersCount}
+*Jawaban salah:* ${wrongAnswersCount}
+*Nilai akhir:* ${score}
+*Waktu pengerjaan:* ${timeTaken}
+---------------------------------------
+Siswa telah menyelesaikan game Balapan Kata tentang makna kata fajar, menyingsing, ufuk, mentari, beranjak, dan karunia.`;
+
+            // Encode for URL
+            const encodedMessage = encodeURIComponent(message);
+            const waUrl = `https://wa.me/${TEACHER_PHONE}?text=${encodedMessage}`;
+
+            // Open WhatsApp link in new tab
+            window.open(waUrl, '_blank');
+        }
+
+        function restartGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswersCount = 0;
+            wrongAnswersCount = 0;
+            startTime = new Date();
+
+            updateScoreHUD();
+            updateCarPosition(0);
+
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+
+            loadQuestion();
+        }
+
+        function returnToMenu() {
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
